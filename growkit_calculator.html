@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>12stundenlicht Growkit Kalkulator Pro</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .logo {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .card h2 {
+            color: #4a5568;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .results {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 30px;
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-item {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .result-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .ppfd-calculator {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: white;
+        }
+
+        .ppfd-calculator h2 {
+            color: white;
+        }
+
+        .ppfd-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .ppfd-item {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .ppfd-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .grow-visualization {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #333;
+            min-height: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tent-container {
+            position: relative;
+            width: 300px;
+            height: 350px;
+            margin: 20px auto;
+            border: 3px solid #333;
+            border-radius: 10px;
+            background: linear-gradient(to bottom, #87ceeb 0%, #98fb98 100%);
+        }
+
+        .lamp {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 20px;
+            background: #ffd700;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .lamp::before {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 100px solid transparent;
+            border-right: 100px solid transparent;
+            border-top: 200px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .plants {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+
+        .plant {
+            width: 40px;
+            height: 60px;
+            background: #228b22;
+            border-radius: 0 0 20px 20px;
+            position: relative;
+        }
+
+        .plant::before {
+            content: '🌱';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 20px;
+        }
+
+        .measurements {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.9);
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 12px;
+            color: #333;
+        }
+
+        .equipment-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .equipment-item {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .equipment-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .equipment-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .price {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #e53e3e;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-seedling"></i> 12stundenlicht
+            </div>
+            <div class="subtitle">Professioneller Growkit Kalkulator Pro</div>
+        </div>
+
+        <div class="main-content">
+            <div class="card">
+                <h2><i class="fas fa-calculator"></i> Growkit Konfigurator</h2>
+                <form id="growForm">
+                    <div class="form-group">
+                        <label for="tentSize">Growzelt Größe:</label>
+                        <select id="tentSize" required>
+                            <option value="">Wähle eine Größe</option>
+                            <option value="60x60">60x60x160cm - 299€</option>
+                            <option value="80x80">80x80x180cm - 399€</option>
+                            <option value="100x100">100x100x200cm - 499€</option>
+                            <option value="120x120">120x120x200cm - 599€</option>
+                            <option value="150x150">150x150x220cm - 799€</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lightType">LED Lampe:</label>
+                        <select id="lightType" required>
+                            <option value="">Wähle eine Lampe</option>
+                            <option value="quantum100">Quantum Board 100W - 149€</option>
+                            <option value="quantum200">Quantum Board 200W - 249€</option>
+                            <option value="quantum300">Quantum Board 300W - 349€</option>
+                            <option value="quantum480">Quantum Board 480W - 449€</option>
+                            <option value="quantum600">Quantum Board 600W - 549€</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fanType">Abluftventilator:</label>
+                        <select id="fanType" required>
+                            <option value="">Wähle einen Lüfter</option>
+                            <option value="fan100">Prima Klima 100mm - 89€</option>
+                            <option value="fan125">Prima Klima 125mm - 109€</option>
+                            <option value="fan150">Prima Klima 150mm - 129€</option>
+                            <option value="fan200">Prima Klima 200mm - 179€</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="circulationFan">Umluftventilator:</label>
+                        <select id="circulationFan" required>
+                            <option value="">Wähle einen Umluftventilator</option>
+                            <option value="circ15">15cm Clip-Ventilator - 29€</option>
+                            <option value="circ20">20cm Clip-Ventilator - 39€</option>
+                            <option value="circ25">25cm Standventilator - 49€</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="plantHeight">Pflanzen Höhe (cm):</label>
+                        <input type="number" id="plantHeight" min="20" max="200" value="60" required>
+                    </div>
+
+                    <button type="submit" class="btn">
+                        <i class="fas fa-magic"></i> Berechnen
+                    </button>
+                </form>
+            </div>
+
+            <div class="card grow-visualization">
+                <h2><i class="fas fa-eye"></i> Growkit Visualisierung</h2>
+                <div class="tent-container">
+                    <div class="lamp"></div>
+                    <div class="plants">
+                        <div class="plant"></div>
+                        <div class="plant"></div>
+                        <div class="plant"></div>
+                    </div>
+                    <div class="measurements">
+                        <div><strong>PPFD Werte:</strong></div>
+                        <div id="ppfdTop">30cm: - μmol/m²/s</div>
+                        <div id="ppfdMid">60cm: - μmol/m²/s</div>
+                        <div id="ppfdBot">90cm: - μmol/m²/s</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card ppfd-calculator">
+                <h2><i class="fas fa-lightbulb"></i> PPFD Kalkulator</h2>
+                <div class="ppfd-grid">
+                    <div class="ppfd-item">
+                        <div class="ppfd-value" id="ppfd30">-</div>
+                        <div>30cm Abstand</div>
+                    </div>
+                    <div class="ppfd-item">
+                        <div class="ppfd-value" id="ppfd60">-</div>
+                        <div>60cm Abstand</div>
+                    </div>
+                    <div class="ppfd-item">
+                        <div class="ppfd-value" id="ppfd90">-</div>
+                        <div>90cm Abstand</div>
+                    </div>
+                    <div class="ppfd-item">
+                        <div class="ppfd-value" id="ppfdPlant">-</div>
+                        <div>Pflanzen Höhe</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="results" id="results">
+            <h2><i class="fas fa-chart-line"></i> Dein Growkit Ergebnis</h2>
+            <div id="resultContent"></div>
+        </div>
+
+        <div class="equipment-showcase">
+            <div class="equipment-item">
+                <div class="equipment-icon"><i class="fas fa-home"></i></div>
+                <h3>Premium Growzelte</h3>
+                <p>Hochwertige Growzelte mit reflektierender Innenseite und stabiler Konstruktion</p>
+                <div class="price">ab 299€</div>
+            </div>
+            <div class="equipment-item">
+                <div class="equipment-icon"><i class="fas fa-lightbulb"></i></div>
+                <h3>LED Quantum Boards</h3>
+                <p>Modernste LED-Technologie mit höchster Effizienz und perfektem Lichtspektrum</p>
+                <div class="price">ab 149€</div>
+            </div>
+            <div class="equipment-item">
+                <div class="equipment-icon"><i class="fas fa-fan"></i></div>
+                <h3>Prima Klima Lüfter</h3>
+                <p>Professionelle Abluftventilatoren für optimale Klimakontrolle</p>
+                <div class="price">ab 89€</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const growData = {
+            tents: {
+                '60x60': { price: 299, area: 0.36, volume: 0.576 },
+                '80x80': { price: 399, area: 0.64, volume: 1.152 },
+                '100x100': { price: 499, area: 1.0, volume: 2.0 },
+                '120x120': { price: 599, area: 1.44, volume: 2.88 },
+                '150x150': { price: 799, area: 2.25, volume: 4.95 }
+            },
+            lights: {
+                'quantum100': { price: 149, watt: 100, ppfd: { 30: 800, 60: 400, 90: 250 } },
+                'quantum200': { price: 249, watt: 200, ppfd: { 30: 1200, 60: 600, 90: 380 } },
+                'quantum300': { price: 349, watt: 300, ppfd: { 30: 1600, 60: 800, 90: 500 } },
+                'quantum480': { price: 449, watt: 480, ppfd: { 30: 2000, 60: 1000, 90: 650 } },
+                'quantum600': { price: 549, watt: 600, ppfd: { 30: 2400, 60: 1200, 90: 800 } }
+            },
+            fans: {
+                'fan100': { price: 89, size: '100mm', capacity: 100 },
+                'fan125': { price: 109, size: '125mm', capacity: 160 },
+                'fan150': { price: 129, size: '150mm', capacity: 240 },
+                'fan200': { price: 179, size: '200mm', capacity: 400 }
+            },
+            circulation: {
+                'circ15': { price: 29, size: '15cm' },
+                'circ20': { price: 39, size: '20cm' },
+                'circ25': { price: 49, size: '25cm' }
+            }
+        };
+
+        function calculatePPFD(lightType, distance) {
+            if (!growData.lights[lightType]) return 0;
+            
+            const light = growData.lights[lightType];
+            const basePPFD = light.ppfd[30] || 0;
+            
+            // Inverse square law approximation
+            const ratio = Math.pow(30 / distance, 2);
+            return Math.round(basePPFD * ratio);
+        }
+
+        function updatePPFDDisplay(lightType, plantHeight) {
+            const ppfd30 = calculatePPFD(lightType, 30);
+            const ppfd60 = calculatePPFD(lightType, 60);
+            const ppfd90 = calculatePPFD(lightType, 90);
+            const ppfdPlant = calculatePPFD(lightType, plantHeight);
+
+            document.getElementById('ppfd30').textContent = ppfd30;
+            document.getElementById('ppfd60').textContent = ppfd60;
+            document.getElementById('ppfd90').textContent = ppfd90;
+            document.getElementById('ppfdPlant').textContent = ppfdPlant;
+
+            document.getElementById('ppfdTop').textContent = `30cm: ${ppfd30} μmol/m²/s`;
+            document.getElementById('ppfdMid').textContent = `60cm: ${ppfd60} μmol/m²/s`;
+            document.getElementById('ppfdBot').textContent = `90cm: ${ppfd90} μmol/m²/s`;
+        }
+
+        document.getElementById('lightType').addEventListener('change', function() {
+            const plantHeight = parseInt(document.getElementById('plantHeight').value) || 60;
+            updatePPFDDisplay(this.value, plantHeight);
+        });
+
+        document.getElementById('plantHeight').addEventListener('input', function() {
+            const lightType = document.getElementById('lightType').value;
+            if (lightType) {
+                updatePPFDDisplay(lightType, parseInt(this.value));
+            }
+        });
+
+        document.getElementById('growForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const tentSize = document.getElementById('tentSize').value;
+            const lightType = document.getElementById('lightType').value;
+            const fanType = document.getElementById('fanType').value;
+            const circulationFan = document.getElementById('circulationFan').value;
+            const plantHeight = parseInt(document.getElementById('plantHeight').value);
+
+            if (!tentSize || !lightType || !fanType || !circulationFan) {
+                alert('Bitte alle Felder ausfüllen!');
+                return;
+            }
+
+            const tent = growData.tents[tentSize];
+            const light = growData.lights[lightType];
+            const fan = growData.fans[fanType];
+            const circulation = growData.circulation[circulationFan];
+
+            const totalPrice = tent.price + light.price + fan.price + circulation.price;
+            const powerConsumption = light.watt;
+            const monthlyElectricity = Math.round(powerConsumption * 12 * 30 * 0.35 / 1000);
+            const ppfdAtPlantHeight = calculatePPFD(lightType, plantHeight);
+            
+            let recommendation = '';
+            if (ppfdAtPlantHeight < 300) {
+                recommendation = '⚠️ Zu wenig Licht für optimales Wachstum';
+            } else if (ppfdAtPlantHeight < 600) {
+                recommendation = '✅ Gut für Wachstumsphase';
+            } else if (ppfdAtPlantHeight < 1000) {
+                recommendation = '🌟 Perfekt für Blütephase';
+            } else {
+                recommendation = '⚡ Sehr hohe Lichtintensität - Vorsicht vor Lichtverbrennung';
+            }
+
+            document.getElementById('resultContent').innerHTML = `
+                <div class="result-item">
+                    <span><i class="fas fa-euro-sign"></i> Gesamtpreis:</span>
+                    <span><strong>${totalPrice}€</strong></span>
+                </div>
+                <div class="result-item">
+                    <span><i class="fas fa-bolt"></i> Stromverbrauch:</span>
+                    <span><strong>${powerConsumption}W</strong></span>
+                </div>
+                <div class="result-item">
+                    <span><i class="fas fa-calendar-month"></i> Monatliche Stromkosten:</span>
+                    <span><strong>~${monthlyElectricity}€</strong></span>
+                </div>
+                <div class="result-item">
+                    <span><i class="fas fa-seedling"></i> PPFD bei Pflanzen:</span>
+                    <span><strong>${ppfdAtPlantHeight} μmol/m²/s</strong></span>
+                </div>
+                <div class="result-item">
+                    <span><i class="fas fa-thumbs-up"></i> Empfehlung:</span>
+                    <span><strong>${recommendation}</strong></span>
+                </div>
+            `;
+
+            document.getElementById('results').classList.add('show');
+        });
+    </script>
+</body>
+</html>
